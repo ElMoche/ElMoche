@@ -34,13 +34,14 @@ void loop() {
   lcd.init();
   lcd.backlight();
   lcd.clear();
+  
  lcd.setCursor(0,0);
   lcd.print("Humedad: "); 
   lcd.print(h); 
   lcd.print(" %\t");
-  lcd.setCursor (0,1);
+ lcd.setCursor (0,1);
   lcd.print("Temp: ");
   lcd.print(f);
-   lcd.print(" *C ");
-     lcd.print(" ");
+  lcd.print(" *C ");
+  lcd.print(" ");
 }
