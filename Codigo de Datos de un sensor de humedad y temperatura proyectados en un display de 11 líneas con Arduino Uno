@@ -1,0 +1,77 @@
+#include <DHT.h>
+ 
+// Definimos el pin digital donde se conecta el sensor
+#define DHTPIN 2
+// Dependiendo del tipo de sensor
+#define DHTTYPE DHT11
+// Inicializamos el sensor DHT11
+DHT dht(DHTPIN, DHTTYPE);
+
+//distintas librerias para que funcione el display 
+#include  <Wire.h>
+#include <LiquidCrystal_I2C.h> 
+LiquidCrystal_I2C lcd(0x27,16,2); // si no te sale con esta direccion  puedes usar (0x3f,16,2) || (0x27,16,2)  ||(0x20,16,2)
+
+//variable del led 
+int v = 7; 
+void setup() {
+//definimos el led como un output
+pinMode(v, OUTPUT);
+   // Inicializamos comunicación serie
+  Serial.begin(9600);
+ 
+  // Comenzamos el sensor DHT
+  dht.begin();
+ 
+}
+void loop() { 
+  // Esperamos 5 segundos entre medidas
+  delay(5000);
+ 
+  // Leemos la humedad relativa
+  float h = dht.readHumidity();
+  // Leemos la temperatura en grados centígrados (por defecto)
+  float t = dht.readTemperature(true);
+  // Leemos la temperatura en grados Fahreheit
+  float f = dht.readTemperature();
+ 
+  // Comprobamos si ha habido algún error en la lectura
+  if (isnan(h) || isnan(t) || isnan(f)) {
+    Serial.println("Error obteniendo los datos del sensor DHT11");
+    return;
+  }
+ 
+  // Calcular el índice de calor en Fahreheit
+  float hif = dht.computeHeatIndex(f, h);
+  // Calcular el índice de calor en grados centígrados
+  float hic = dht.computeHeatIndex(t, h, false);
+  
+  //cada 5 segundos el sensor parpadea 
+  lcd.display();
+  delay(500);
+  lcd.noDisplay();
+  delay(500);
+  
+  //para que los datos de humedad y temperatura aparescan en el display 
+  lcd.init();
+  lcd.backlight();
+  lcd.clear();
+ lcd.setCursor(0,0);
+  lcd.print("Humedad: "); 
+  lcd.print(h); 
+  lcd.print(" %\t");
+  lcd.setCursor (0,1);
+  lcd.print("Temp: ");
+  lcd.print(f);
+   lcd.print(" *C ");
+     lcd.print(" ");
+
+// si la humedad es mayor a 60, se va a prender un led, en el caso que no este se va a apagar 
+     if (h>60){
+  digitalWrite (v, HIGH);
+ 
+}
+ else if (h<60){
+ digitalWrite (v, LOW);
+}
+}
